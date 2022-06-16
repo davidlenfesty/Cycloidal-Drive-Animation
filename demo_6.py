@@ -547,182 +547,80 @@ def update_inner_pinA(e,Rm, phi):
     #self.line.set_data([0,x1],[0,y1])
     dotA.set_data(x1, y1)
 
-##inner pinD:
-#x = (rd+e)*np.cos(t)-e
-#y = (rd+e)*np.sin(t)
-#inner_pinD, = ax.plot(x,y,'b-')
-##driver line and dot:
-#self.line, = self.ax.plot([self.rd+self.e + self.e, 0],[0,0],'r-')
-#dotD, = ax.plot([-rd- e- e],[0], 'bo', ms=5)
-
-#def update_inner_pinD(e,Rm, phi):
-#   x = (Rm+e)*np.cos(t)-e*np.cos(phi)
-#   y = (Rm+e)*np.sin(t)-e*np.sin(phi)
-# #  inner_pinD.set_data(x,y)
-    
-#   x1 = (Rm+e)*np.cos(phi+np.pi)-e*np.cos(phi)
-#   y1 = (Rm+e)*np.sin(phi+np.pi)-e*np.sin(phi)
-    #self.line.set_data([0,x1],[0,y1])
-#   dotD.set_data(x1, y1)
-
-
-
-##ehypocycloidA:
-RD=40
-rd=5
-rc = (n-1)*(RD/n)
-rm = (RD/n)
-xa = (rc+rm)*np.cos(t)-e*np.cos((rc+rm)/rm*t)
-ya = (rc+rm)*np.sin(t)-e*np.sin((rc+rm)/rm*t)
-
-dxa = (rc+rm)*(-np.sin(t)+(e/rm)*np.sin((rc+rm)/rm*t))
-dya = (rc+rm)*(np.cos(t)-(e/rm)*np.cos((rc+rm)/rm*t))
-
-x = xa + rd/np.sqrt(dxa**2 + dya**2)*(-dya) 
-y = ya + rd/np.sqrt(dxa**2 + dya**2)*dxa
-ehypocycloidA, = ax.plot(x,y,'r-')
-##driver line and dot: (rc+rm) - rd
-#self.eline, = self.ax.plot([(rc+rm) - rd, 0],[0,0],'r-')
-edotA, = ax.plot([(rc+rm) - rd],[0], 'ro', ms=5)
-
-def update_ehypocycloidA(e,n,D,d, phis):
+def ehypocycloid_common(e, n, D, d):
+    # major radius
     RD=D/2
+    # post radius
+    rm=RD/n
     rd=d/2
-    rc = (n-1)*(RD/n)
-    rm = (RD/n)
-    xa = (rc+rm)*np.cos(t)-e*np.cos((rc+rm)/rm*t)
-    ya = (rc+rm)*np.sin(t)-e*np.sin((rc+rm)/rm*t)
+    xa = RD*np.cos(t)-e*np.cos(n*t)
+    ya = RD*np.sin(t)-e*np.sin(n*t)
 
-    dxa = (rc+rm)*(-np.sin(t)+(e/rm)*np.sin((rc+rm)/rm*t))
-    dya = (rc+rm)*(np.cos(t)-(e/rm)*np.cos((rc+rm)/rm*t))
+    dxa = RD*(-np.sin(t)+(e/rm)*np.sin(n*t))
+    dya = RD*(np.cos(t)-(e/rm)*np.cos(n*t))
 
-    #x = (xa + rd/np.sqrt(dxa**2 + dya**2)*(-dya))*np.cos(phis/(n-1))-(ya + rd/np.sqrt(dxa**2 + dya**2)*dxa)*np.sin(phis/(n-1))  + e*np.cos(-phis) + e
-    #y = (xa + rd/np.sqrt(dxa**2 + dya**2)*(-dya))*np.sin(phis/(n-1))+(ya + rd/np.sqrt(dxa**2 + dya**2)*dxa)*np.cos(phis/(n-1))  + e*np.sin(-phis)
-    #ehypocycloidA.set_data(x,y)
+    return (xa, ya, dxa, dya)
+
+
+def gen_ehypocycloidA(e,n,D,d, phis):
+    xa, ya, dxa, dya = ehypocycloid_common(e, n, D, d)
+
     x = (xa + rd/np.sqrt(dxa**2 + dya**2)*(-dya))*np.cos(-2*phis/(n-1))-(ya + rd/np.sqrt(dxa**2 + dya**2)*dxa)*np.sin(-2*phis/(n-1))  + 2*e*np.cos(phis) 
     y = (xa + rd/np.sqrt(dxa**2 + dya**2)*(-dya))*np.sin(-2*phis/(n-1))+(ya + rd/np.sqrt(dxa**2 + dya**2)*dxa)*np.cos(-2*phis/(n-1))  + 2*e*np.sin(phis)
-    ehypocycloidA.set_data(x,y)    
 
-    #self.eline.set_data([e*np.cos(phis),x[0]],[e*np.sin(phis),y[0]])
-    edotA.set_data(x[0], y[0])
+    return x, y
 
-##ehypocycloidE:
+def gen_ehypocycloidE(e,n,D,d, phis):
+    """
+    Outermost moving ring
 
-rc = (n-1)*(RD/n)
-rm = (RD/n)
-xa = (rc+rm)*np.cos(t)-e*np.cos((rc+rm)/rm*t)
-ya = (rc+rm)*np.sin(t)-e*np.sin((rc+rm)/rm*t)
+    :param e: eccentricity of center thingie
+    :paran n: number of posts
+    :param D: Major diameter
+    :param d: diameter of posts
+    :param phis: phase
+    """
+    
+    xa, ya, dxa, dya = ehypocycloid_common(e, n, D, d)
 
-dxa = (rc+rm)*(-np.sin(t)+(e/rm)*np.sin((rc+rm)/rm*t))
-dya = (rc+rm)*(np.cos(t)-(e/rm)*np.cos((rc+rm)/rm*t))
-
-
-x = xa - rd/np.sqrt(dxa**2 + dya**2)*(-dya) 
-y = ya - rd/np.sqrt(dxa**2 + dya**2)*dxa
-ehypocycloidE, = ax.plot(x,y,'r-')
-##driver line and dot: (rc+rm) - rd
-#self.eline, = self.ax.plot([(rc+rm) - rd, 0],[0,0],'r-')
-#edotE, = ax.plot([(rc+rm) - rd],[0], 'ro', ms=5)
-
-def update_ehypocycloidE(e,n,D,d, phis):
-    RD=D/2
-    rd=d/2
-    rc = (n-1)*(RD/n)
-    rm = (RD/n)
-    xa = (rc+rm)*np.cos(t)-e*np.cos((rc+rm)/rm*t)
-    ya = (rc+rm)*np.sin(t)-e*np.sin((rc+rm)/rm*t)
-
-    dxa = (rc+rm)*(-np.sin(t)+(e/rm)*np.sin((rc+rm)/rm*t))
-    dya = (rc+rm)*(np.cos(t)-(e/rm)*np.cos((rc+rm)/rm*t))
-
-    #x = (xa + rd/np.sqrt(dxa**2 + dya**2)*(-dya))*np.cos(phis/(n-1))-(ya + rd/np.sqrt(dxa**2 + dya**2)*dxa)*np.sin(phis/(n-1))  + e*np.cos(-phis) + e
-    #y = (xa + rd/np.sqrt(dxa**2 + dya**2)*(-dya))*np.sin(phis/(n-1))+(ya + rd/np.sqrt(dxa**2 + dya**2)*dxa)*np.cos(phis/(n-1))  + e*np.sin(-phis)
-    #ehypocycloidA.set_data(x,y)
     x = (xa - rd/np.sqrt(dxa**2 + dya**2)*(-dya))*np.cos(-2*phis/(n-1))-(ya - rd/np.sqrt(dxa**2 + dya**2)*dxa)*np.sin(-2*phis/(n-1))  + 2*e*np.cos(phis) 
     y = (xa - rd/np.sqrt(dxa**2 + dya**2)*(-dya))*np.sin(-2*phis/(n-1))+(ya - rd/np.sqrt(dxa**2 + dya**2)*dxa)*np.cos(-2*phis/(n-1))  + 2*e*np.sin(phis)
-    ehypocycloidE.set_data(x,y)    
 
-    #self.eline.set_data([e*np.cos(phis),x[0]],[e*np.sin(phis),y[0]])
-    #edotE.set_data(x[0], y[0])
+    return x, y
 
-##ehypocycloidD:
-
-rc = (n+1)*(RD/n)
-rm = (RD/n)
-xa = (rc-rm)*np.cos(t)+e*np.cos((rc-rm)/rm*t)
-ya = (rc-rm)*np.sin(t)-e*np.sin((rc-rm)/rm*t)
-
-dxa = (rc-rm)*(-np.sin(t)-(e/rm)*np.sin((rc-rm)/rm*t))
-dya = (rc-rm)*(np.cos(t)-(e/rm)*np.cos((rc-rm)/rm*t))
-
-#x = xa - rd/np.sqrt(dxa**2 + dya**2)*(-dya) - e
-#y = ya - rd/np.sqrt(dxa**2 + dya**2)*dxa
-x = xa - rd/np.sqrt(dxa**2 + dya**2)*(-dya) 
-y = ya - rd/np.sqrt(dxa**2 + dya**2)*dxa
-
-ehypocycloidD, = ax.plot(x,y,'b-')
-##driver line and dot: (rc+rm) - rd
-#self.eline, = self.ax.plot([(rc+rm) - rd, 0],[0,0],'r-')
-edotD, = ax.plot([(rc+rm) - rd + e],[0], 'bo', ms=5)
-
-def update_ehypocycloidD(e,n,D,d, phis):
-    RD=D/2
-    rd=d/2
-    rc = (n+1)*(RD/n)
-    rm = (RD/n)
-    xa = (rc-rm)*np.cos(t)+e*np.cos((rc-rm)/rm*t)
-    ya = (rc-rm)*np.sin(t)-e*np.sin((rc-rm)/rm*t)
-
-    dxa = (rc-rm)*(-np.sin(t)-(e/rm)*np.sin((rc-rm)/rm*t))
-    dya = (rc-rm)*(np.cos(t)-(e/rm)*np.cos((rc-rm)/rm*t))
+def gen_ehypocycloidD(e,n,D,d, phis):
+    xa, ya, dxa, dya = ehypocycloid_common(e, n, D, d)
 
     x = (xa - rd/np.sqrt(dxa**2 + dya**2)*(-dya))
     y = (ya - rd/np.sqrt(dxa**2 + dya**2)*dxa)
 
-    ehypocycloidD.set_data(x,y)
+    return x, y
 
-    #self.eline.set_data([e*np.cos(phis),x[0]],[e*np.sin(phis),y[0]])
-    edotD.set_data(x[0], y[0])
-
-##ehypocycloidF:
-
-rc = (n+1)*(RD/n)
-rm = (RD/n)
-xa = (rc-rm)*np.cos(t)+e*np.cos((rc-rm)/rm*t)
-ya = (rc-rm)*np.sin(t)-e*np.sin((rc-rm)/rm*t)
-
-dxa = (rc-rm)*(-np.sin(t)-(e/rm)*np.sin((rc-rm)/rm*t))
-dya = (rc-rm)*(np.cos(t)-(e/rm)*np.cos((rc-rm)/rm*t))
-
-#x = xa - rd/np.sqrt(dxa**2 + dya**2)*(-dya) - e
-#y = ya - rd/np.sqrt(dxa**2 + dya**2)*dxa
-x = xa + rd/np.sqrt(dxa**2 + dya**2)*(-dya) 
-y = ya + rd/np.sqrt(dxa**2 + dya**2)*dxa
-
-ehypocycloidF, = ax.plot(x,y,'b-')
-##driver line and dot: (rc+rm) - rd
-#self.eline, = self.ax.plot([(rc+rm) - rd, 0],[0,0],'r-')
-#edotF, = ax.plot([(rc+rm) - rd + e],[0], 'bo', ms=5)
-
-def update_ehypocycloidF(e,n,D,d, phis):
-    RD=D/2
-    rd=d/2
-    rc = (n+1)*(RD/n)
-    rm = (RD/n)
-    xa = (rc-rm)*np.cos(t)+e*np.cos((rc-rm)/rm*t)
-    ya = (rc-rm)*np.sin(t)-e*np.sin((rc-rm)/rm*t)
-
-    dxa = (rc-rm)*(-np.sin(t)-(e/rm)*np.sin((rc-rm)/rm*t))
-    dya = (rc-rm)*(np.cos(t)-(e/rm)*np.cos((rc-rm)/rm*t))
+def gen_ehypocycloidF(e,n,D,d, phis):
+    xa, ya, dxa, dya = ehypocycloid_common(e, n, D, d)
 
     x = (xa + rd/np.sqrt(dxa**2 + dya**2)*(-dya))
     y = (ya + rd/np.sqrt(dxa**2 + dya**2)*dxa)
 
-    ehypocycloidF.set_data(x,y)
+    return x, y
 
-    #self.eline.set_data([e*np.cos(phis),x[0]],[e*np.sin(phis),y[0]])
-    #edotF.set_data(x[0], y[0])
+def init_ehypocycloids(e, n, D, d):
+    global ehypocycloidA, ehypocycloidE, ehypocycloidD, ehypocycloidF
+    global edotA, edotD
 
+    x, y = gen_ehypocycloidA(e, n, D, d, 0)
+    ehypocycloidA = ax.plot(x,y,'r-')[0]
+    edotA = ax.plot([RD - rd],[0], 'ro', ms=5)[0]
+
+    x, y = gen_ehypocycloidE(e, n, D, d, 0)
+    ehypocycloidE = ax.plot(x,y,'r-')[0]
+
+    x, y = gen_ehypocycloidD(e, n, D, d, 0)
+    ehypocycloidD = ax.plot(x,y,'b-')[0]
+    edotD = ax.plot([RD - rd + e],[0], 'bo', ms=5)[0]
+
+    x, y = gen_ehypocycloidF(e, n, D, d, 0)
+    ehypocycloidF = ax.plot(x, y, 'b-')[0]
 
 
 axcolor = 'lightgoldenrodyellow'
@@ -788,6 +686,8 @@ def reset(event):
 
 button.on_clicked(reset)
 
+init_ehypocycloids(2, 10, 80, 10)
+
 def animate(frame):
     sfm = sli_fm.val
     sRm = sli_Rm.val
@@ -812,10 +712,20 @@ def animate(frame):
     #drive_pin_update(sRm)
     #update_inner_circle(se,sn,sN,srd,sRd, phi)
     
-    update_ehypocycloidA(se,sN,sD,sd, phi)
-    update_ehypocycloidE(se,sN,sD,sd, phi)
-    update_ehypocycloidD(se,sN,sD,sd, phi)
-    update_ehypocycloidF(se,sN,sD,sd, phi)
+    x, y = gen_ehypocycloidA(se,sN,sD,sd, phi)
+    ehypocycloidA.set_data(x, y)
+    edotA.set_data(x[0], y[0])
+
+    x, y = gen_ehypocycloidE(se,sN,sD,sd, phi)
+    ehypocycloidE.set_data(x, y)
+
+    x, y = gen_ehypocycloidD(se,sN,sD,sd, phi)
+    ehypocycloidD.set_data(x, y)
+    edotD.set_data(x[0], y[0])
+
+    x, y = gen_ehypocycloidF(se,sN,sD,sd, phi)
+    ehypocycloidF.set_data(x, y)
+
     fig.canvas.draw_idle()
 
 
