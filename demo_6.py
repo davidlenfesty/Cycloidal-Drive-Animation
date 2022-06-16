@@ -101,23 +101,42 @@ def update_inner_pinA(e,Rm, phi):
     #self.line.set_data([0,x1],[0,y1])
     dotA.set_data(x1, y1)
 
-def ehypocycloid_common(e, n, D, d):
+def ehypocycloid_AE(e, n, D, d):
     # major radius
     RD=D/2
     # post radius
-    rm=RD/n
     rd=d/2
-    xa = RD*np.cos(t)-e*np.cos(n*t)
-    ya = RD*np.sin(t)-e*np.sin(n*t)
 
-    dxa = RD*(-np.sin(t)+(e/rm)*np.sin(n*t))
-    dya = RD*(np.cos(t)-(e/rm)*np.cos(n*t))
+    rc = (n-1)*(RD/n)
+    rm = (RD/n)
+    xa = (rc+rm)*np.cos(t)-e*np.cos((rc+rm)/rm*t)
+    ya = (rc+rm)*np.sin(t)-e*np.sin((rc+rm)/rm*t)
+
+    dxa = (rc+rm)*(-np.sin(t)+(e/rm)*np.sin((rc+rm)/rm*t))
+    dya = (rc+rm)*(np.cos(t)-(e/rm)*np.cos((rc+rm)/rm*t))
+
+    return xa, ya, dxa, dya, rd
+
+
+def ehypocycloid_DF(e, n, D, d):
+    # major radius
+    RD=D/2
+    # post radius
+    rd=d/2
+
+    rc = (n+1)*(RD/n)
+    rm = (RD/n)
+    xa = (rc-rm)*np.cos(t)+e*np.cos((rc-rm)/rm*t)
+    ya = (rc-rm)*np.sin(t)-e*np.sin((rc-rm)/rm*t)
+
+    dxa = (rc-rm)*(-np.sin(t)-(e/rm)*np.sin((rc-rm)/rm*t))
+    dya = (rc-rm)*(np.cos(t)-(e/rm)*np.cos((rc-rm)/rm*t))
 
     return (xa, ya, dxa, dya, rd)
 
 
 def gen_ehypocycloidA(e,n,D,d, phis):
-    xa, ya, dxa, dya, rd = ehypocycloid_common(e, n, D, d)
+    xa, ya, dxa, dya, rd = ehypocycloid_AE(e, n, D, d)
 
     x = (xa + rd/np.sqrt(dxa**2 + dya**2)*(-dya))*np.cos(-2*phis/(n-1))-(ya + rd/np.sqrt(dxa**2 + dya**2)*dxa)*np.sin(-2*phis/(n-1))  + 2*e*np.cos(phis) 
     y = (xa + rd/np.sqrt(dxa**2 + dya**2)*(-dya))*np.sin(-2*phis/(n-1))+(ya + rd/np.sqrt(dxa**2 + dya**2)*dxa)*np.cos(-2*phis/(n-1))  + 2*e*np.sin(phis)
@@ -135,7 +154,7 @@ def gen_ehypocycloidE(e,n,D,d, phis):
     :param phis: phase
     """
     
-    xa, ya, dxa, dya, rd = ehypocycloid_common(e, n, D, d)
+    xa, ya, dxa, dya, rd = ehypocycloid_AE(e, n, D, d)
 
     x = (xa - rd/np.sqrt(dxa**2 + dya**2)*(-dya))*np.cos(-2*phis/(n-1))-(ya - rd/np.sqrt(dxa**2 + dya**2)*dxa)*np.sin(-2*phis/(n-1))  + 2*e*np.cos(phis) 
     y = (xa - rd/np.sqrt(dxa**2 + dya**2)*(-dya))*np.sin(-2*phis/(n-1))+(ya - rd/np.sqrt(dxa**2 + dya**2)*dxa)*np.cos(-2*phis/(n-1))  + 2*e*np.sin(phis)
@@ -143,7 +162,9 @@ def gen_ehypocycloidE(e,n,D,d, phis):
     return x, y
 
 def gen_ehypocycloidD(e,n,D,d, phis):
-    xa, ya, dxa, dya, rd = ehypocycloid_common(e, n, D, d)
+    xa, ya, dxa, dya, rd = ehypocycloid_DF(e, n, D, d)
+
+    phis = phis + (np.pi / n)
 
     x = (xa - rd/np.sqrt(dxa**2 + dya**2)*(-dya))
     y = (ya - rd/np.sqrt(dxa**2 + dya**2)*dxa)
@@ -151,7 +172,9 @@ def gen_ehypocycloidD(e,n,D,d, phis):
     return x, y
 
 def gen_ehypocycloidF(e,n,D,d, phis):
-    xa, ya, dxa, dya, rd = ehypocycloid_common(e, n, D, d)
+    xa, ya, dxa, dya, rd = ehypocycloid_DF(e, n, D, d)
+
+    phis = phis + (np.pi / n)
 
     x = (xa + rd/np.sqrt(dxa**2 + dya**2)*(-dya))
     y = (ya + rd/np.sqrt(dxa**2 + dya**2)*dxa)
